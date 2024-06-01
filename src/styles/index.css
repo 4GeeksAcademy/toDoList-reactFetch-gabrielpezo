@@ -1,12 +1,48 @@
+ul li{
+    list-style:none;
+    margin:0px;
+    display:flex;
+    justify-content:space-between;
+}
 
-/* 
+ul{
+    width: 605px;
+    font-size: 50px;
+    padding:15px;
+    padding-bottom:10px;
+    margin:auto;
+    background-color: rgb(231, 231, 217);
+}
+.title{
+    font-size: 100px;
+    width: 605px;
+    margin:auto;
+    margin-bottom: 10px;
+    background-color: rgba(231, 231, 217, 0.459);
+    border-radius: 20px;
+}
+.divCon{
+    background-color: rgb(25, 148, 255);
+    margin-top:100px;
+}
+.backGround{
+    background-color: rgb(25, 148, 255);
+}
+body{
+    background-color: rgb(25, 148, 255);
+}
 
-    You can write your own styles here...
-    
-    
-    ...Or you can use the import command to include 
-    other sylesheets into your bunde as well, e.j:
-    
-    import 'relative/path/to/stylesheet.scss';
-
-*/
+input{
+    border:0;
+    background:transparent;
+}
+.iconX{
+    font-size: 90px;
+    color: rgba(206, 38, 38, 0.555);
+}
+.counter{
+    width: 600px;
+    margin:auto;
+    margin-top:0px;
+    font-size: 30px;
+}
