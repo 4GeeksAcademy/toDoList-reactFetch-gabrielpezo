@@ -1,11 +1,7 @@
-import React, {useState,useEffect} from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-//include images into your bundle
-
-
-//create your first component
 const Home = () => {
     const [list, setList] = useState([]);
     const [user, setUser] = useState('');
@@ -13,17 +9,23 @@ const Home = () => {
 
     // Función para obtener las tareas del usuario
     const fetchTasks = () => {
-		fetch('https://playground.4geeks.com/todo/users/gabriel')
-			.then(response => response.json())
-			.then(data => {
-				if (Array.isArray(data)) {
-					setList(data);
-				} else {
-					console.error('Error fetching tasks: Unexpected response format');
-				}
-			})
-			.catch(error => console.error('Error fetching tasks:', error));
-	};
+        fetch('https://playground.4geeks.com/todo/users/gabriel')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (Array.isArray(data.todos)) {
+                    setList(data.todos);
+                } else {
+                    console.error('Error fetching tasks: Unexpected response format');
+                }
+            })
+            .catch(error => console.error('Error fetching tasks:', error));
+    };
+
     // Función para crear un usuario
     const createUser = () => {
         fetch('https://playground.4geeks.com/todo/users/gabriel', {
@@ -32,13 +34,13 @@ const Home = () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-				"name": "gabriel",
-				"todos": []
-			})
+                "name": "gabriel",
+                "todos": []
+            })
         })
-            .then(response => response.json())
-            .then(data => setUser(data))
-            .catch(error => console.error('Error creating user:', error));
+        .then(response => response.json())
+        .then(data => setUser(data))
+        .catch(error => console.error('Error creating user:', error));
     };
 
     useEffect(() => {
@@ -48,19 +50,48 @@ const Home = () => {
 
     // Función para agregar una tarea
     const addTask = () => {
+        const newTask = {
+            label: input,
+            is_done: false
+        };
+
         fetch('https://playground.4geeks.com/todo/users/gabriel', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify([...list, input])
-        })
-            .then(response => response.json())
-            .then(() => {
-                setList([...list, input]);
-                setInput('');
+            body: JSON.stringify({
+                name: 'gabriel',
+                todos: [...list, newTask]
             })
-            .catch(error => console.error('Error adding task:', error));
+        })
+        .then(response => response.json())
+        .then(() => {
+            setList([...list, newTask]); // Actualiza el estado local con la nueva lista que incluye la nueva tarea
+            setInput(''); // Limpia el campo de entrada
+        })
+        .catch(error => console.error('Error adding task:', error));
+    };
+
+    // Función para eliminar una tarea
+    const removeTask = (index) => {
+        const updatedList = list.filter((_, idx) => idx !== index);
+
+        fetch('https://playground.4geeks.com/todo/users/gabriel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: 'gabriel',
+                todos: updatedList
+            })
+        })
+        .then(response => response.json())
+        .then(() => {
+            setList(updatedList); // Actualiza el estado local con la lista filtrada
+        })
+        .catch(error => console.error('Error removing task:', error));
     };
 
     // Renderizado
@@ -89,23 +120,11 @@ const Home = () => {
                     </li>
                     {list.map((item, index) => (
                         <li key={index}>
-                            {item}
+                            {item.label}
                             <FontAwesomeIcon
                                 className="iconX"
                                 icon={faXmark}
-                                onClick={() => {
-                                    const updatedList = list.filter((_, idx) => idx !== index);
-                                    fetch('https://playground.4geeks.com/todo/user/gabriel', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify(updatedList)
-                                    })
-                                        .then(response => response.json())
-                                        .then(() => setList(updatedList))
-                                        .catch(error => console.error('Error removing task:', error));
-                                }}
+                                onClick={() => removeTask(index)}
                             />
                         </li>
                     ))}
