@@ -7,7 +7,6 @@ const Home = () => {
     const [user, setUser] = useState('');
     const [input, setInput] = useState('');
 
-    // Función para obtener las tareas del usuario
     const fetchTasks = () => {
         fetch('https://playground.4geeks.com/todo/users/gabriel')
             .then(response => {
@@ -26,7 +25,6 @@ const Home = () => {
             .catch(error => console.error('Error fetching tasks:', error));
     };
 
-    // Función para crear un usuario
     const createUser = () => {
         fetch('https://playground.4geeks.com/todo/users/gabriel', {
             method: 'POST',
@@ -44,57 +42,46 @@ const Home = () => {
     };
 
     useEffect(() => {
-        fetchTasks(); // Obtiene las tareas al cargar la página
-        createUser(); // Crea el usuario al cargar la página
+        fetchTasks(); 
     }, []);
 
-    // Función para agregar una tarea
     const addTask = () => {
         const newTask = {
             label: input,
             is_done: false
         };
 
-        fetch('https://playground.4geeks.com/todo/users/gabriel', {
+        fetch('https://playground.4geeks.com/todo/todos/gabriel', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                name: 'gabriel',
-                todos: [...list, newTask]
-            })
+            body: JSON.stringify(newTask)
         })
         .then(response => response.json())
         .then(() => {
-            setList([...list, newTask]); // Actualiza el estado local con la nueva lista que incluye la nueva tarea
-            setInput(''); // Limpia el campo de entrada
+            fetchTasks(); 
+            setInput(''); 
         })
         .catch(error => console.error('Error adding task:', error));
     };
 
-    // Función para eliminar una tarea
-    const removeTask = (index) => {
-        const updatedList = list.filter((_, idx) => idx !== index);
-
-        fetch('https://playground.4geeks.com/todo/users/gabriel', {
-            method: 'POST',
+    const removeTask = (id) => {
+        fetch(`https://playground.4geeks.com/todo/todos/${id}`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: 'gabriel',
-                todos: updatedList
-            })
+            }
         })
-        .then(response => response.json())
-        .then(() => {
-            setList(updatedList); // Actualiza el estado local con la lista filtrada
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            fetchTasks(); 
         })
         .catch(error => console.error('Error removing task:', error));
     };
-
-    // Renderizado
+   
     return (
         <div className="backGround">
             <div className="divCon container text-center">
@@ -124,7 +111,7 @@ const Home = () => {
                             <FontAwesomeIcon
                                 className="iconX"
                                 icon={faXmark}
-                                onClick={() => removeTask(index)}
+                                onClick={() => removeTask(item.id)}
                             />
                         </li>
                     ))}
